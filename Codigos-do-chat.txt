@@ -1,0 +1,246 @@
+@Override
+   public void Render() {
+      // clear the screen with a dark blue color. The
+      // arguments to glClearColor are the red, green
+      // blue and alpha component in the range [0,1]
+      // of the color to be used to clear the screen.
+      Gdx.gl.glClearColor(0, 0, 0.2f, 1);
+      Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+      // tell the camera to update its matrices.
+      camera.update();
+      // tell the SpriteBatch to render in the
+      // coordinate system specified by the camera.
+      batch.setProjectionMatrix(camera.combined);
+      // begin a new batch and draw the bucket and
+      // all drops
+      batch.begin();
+      batch.draw(bucketImage, bucket.x, bucket.y);
+      for(Rectangle raindrop: raindrops) {
+         batch.draw(dropImage, raindrop.x, raindrop.y);
+      }
+      batch.end();
+      // process user input
+      if(Gdx.input.isTouched()) {
+         Vector3 touchPos = new Vector3();
+         touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+         camera.unproject(touchPos);
+         bucket.x = touchPos.x - 64 / 2;
+      }
+      if(Gdx.input.isKeyPressed(Keys.LEFT)) bucket.x -= 200 * Gdx.graphics.getDeltaTime();
+      if(Gdx.input.isKeyPressed(Keys.RIGHT)) bucket.x += 200 * Gdx.graphics.getDeltaTime();
+      // make sure the bucket stays within the screen bounds
+      if(bucket.x < 0) bucket.x = 0;
+      if(bucket.x > 800 - 64) bucket.x = 800 - 64;
+      // check if we need to create a new raindrop
+      if(TimeUtils.nanoTime() - lastDropTime > 1000000000) spawnRaindrop();
+      // move the raindrops, remove any that are beneath the bottom edge of
+      // the screen or that hit the bucket. In the later case we play back
+      // a sound effect as well.
+      Iterator<Rectangle> iter = raindrops.iterator();
+      while(iter.hasNext()) {
+         Rectangle raindrop = iter.next();
+         raindrop.y -= 200 * Gdx.graphics.getDeltaTime();
+         if(raindrop.y + 64 < 0) iter.remove();
+         if(raindrop.overlaps(bucket)) {
+            dropSound.play();
+            iter.remove();
+         }
+      }
+   }
+   @Override
+   public void dispose() {
+      // dispose of all the native resources
+      dropImage.dispose();
+      bucketImage.dispose();
+      dropSound.dispose();
+      rainMusic.dispose();
+      batch.dispose();
+   }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+public void cliquePlay() {
+		
+		clickPos = new Vector3();
+		clickPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+		camera.unproject(clickPos);
+		boolean click;
+		
+		if (clickPos.x >= 552 && clickPos.x <= 727) {
+			if (clickPos.y >= 290  && clickPos.y <= 351) {
+		
+				click = Gdx.input.justTouched();
+					
+				if (click == true) {
+					Tabuleiro();
+				}
+			}
+		}
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+SETANDO BIBLIOTECAS E SETANDO AS IMAGENS E ATRIBUTOS
+
+
+
+package com.badlogic.drop;
+import java.util.Iterator;
+import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.TimeUtils;
+public class Drop extends ApplicationAdapter {
+   private Texture dropImage;
+   private Texture bucketImage;
+   private Sound dropSound;
+   private Music rainMusic;
+   private SpriteBatch batch;
+   private OrthographicCamera camera;
+   private Rectangle bucket;
+   private Array<Rectangle> raindrops;
+   private long lastDropTime;
+   @Override
+   public void create() {
+      // load the images for the droplet and the bucket, 64x64 pixels each
+      dropImage = new Texture(Gdx.files.internal("droplet.png"));
+      bucketImage = new Texture(Gdx.files.internal("bucket.png"));
+      // load the drop sound effect and the rain background "music"
+      dropSound = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
+      rainMusic = Gdx.audio.newMusic(Gdx.files.internal("rain.mp3"));
+      // start the playback of the background music immediately
+      rainMusic.setLooping(true);
+      rainMusic.play();
+      // create the camera and the SpriteBatch
+      camera = new OrthographicCamera();
+      camera.setToOrtho(false, 800, 480);
+      batch = new SpriteBatch();
+      // create a Rectangle to logically represent the bucket
+      bucket = new Rectangle();
+      bucket.x = 800 / 2 - 64 / 2; // center the bucket horizontally
+      bucket.y = 20; // bottom left corner of the bucket is 20 pixels above the bottom screen edge
+      bucket.width = 64;
+      bucket.height = 64;
+
+
+
+
+
+
+
+
+
+
+
+
+
+TABULEIRO RAFAEL:
+
+
+import java.util.Random;
+import java.util.Scanner;
+public class TABULEIRO {
+	//VÁRIAVEIS
+	char[][] tabuleiro = new char[10][10];
+    private int tentativas = 0, acertos = 0;
+    private int auxiliarGerador1 = 0, auxiliarGerador2 = 0;
+    private int auxLinha = 0, auxColuna = 0;
+	
+	//MÉTODOS
+	
+    public void LimpaTabuleiro(char[][] tabuleiro){
+        for(int linha=0 ; linha < 10 ; linha++ ){
+            for(int coluna=0 ; coluna < 10 ; coluna++ ){
+                tabuleiro[linha][coluna]= '~';
+            }
+        }
+    }
+    
+    public void ExbeTabuleiro(char[][] tabuleiro){   
+        for(int linha=0 ; linha < 10 ; linha++ ){
+            for(int coluna=0 ; coluna < 10 ; coluna++ ){
+                if(tabuleiro[linha][coluna]=='~'){
+                    System.out.print("\t"+"~");
+                }else if(tabuleiro[linha][coluna]=='A'){
+                    System.out.print("\t"+"A");
+                }else if(tabuleiro[linha][coluna]=='B'){
+                    System.out.print("\t"+"B");
+                }
+                
+            }
+            System.out.println();
+        }
+    }
+    /*
+    public void GeraNavios(char[][] tabuleiro){
+        Random gerador = new Random();
+        Random gerador2 = new Random();
+        auxiliarGerador1 = gerador.nextInt(10);
+        auxiliarGerador2 = gerador2.nextInt(10);
+        
+        //gerando barco de 5 posiçoes aleatoriamente
+        if((tabuleiro[auxiliarGerador1][auxiliarGerador2]=='~') && (tabuleiro[auxiliarGerador1][auxiliarGerador2+1]=='~') && 
+        		(tabuleiro[auxiliarGerador1][auxiliarGerador2+2]=='~') &&
+        		(tabuleiro[auxiliarGerador1][auxiliarGerador2+3]=='~') && (tabuleiro[auxiliarGerador1][auxiliarGerador2+4]=='~') ){
+        	
+        }
+    }
+*/
+    public void Disparo(char[][] tabueleiro){
+        Scanner entrada = new Scanner(System.in);
+        System.out.print("Linha: ");
+        auxLinha = entrada.nextInt();
+        auxLinha = auxLinha - 1;
+        System.out.print("Coluna: ");
+        auxColuna = auxColuna - 1;
+        auxColuna = entrada.nextInt();
+        if(tabuleiro[auxLinha][auxColuna] == 'B'){
+        	System.out.println("Acertou");
+         }else{	//nessa parte aqui sei la tu revela a casa ;
+        	 System.out.println("Errou");
+         }
+     }
+
+
+
+
+
+
+
